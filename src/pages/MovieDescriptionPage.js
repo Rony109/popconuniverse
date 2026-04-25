@@ -29,6 +29,8 @@ function groupShowtimesByTheatre(showtimes) {
 }
 
 function MovieDescriptionPage({ movie, navigate }) {
+  const [imgFailed, setImgFailed] = useState(false);
+
   if (!movie) {
     return (
       <div className="page-wrapper">
@@ -39,8 +41,6 @@ function MovieDescriptionPage({ movie, navigate }) {
       </div>
     );
   }
-
-  const [imgFailed, setImgFailed] = useState(false);
   const posterGradient = POSTER_GRADIENTS[movie.poster] || POSTER_GRADIENTS.default || POSTER_GRADIENTS.mp1;
   const showImage = movie.posterUrlLarge && !imgFailed;
   const showtimeGroups = groupShowtimesByTheatre(movie.showtimes || []);
