@@ -1,0 +1,17 @@
+/* Shared styles for SignIn and Join pages */
+/* Most auth styles live in globals.css */
+
+.join-right {
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  padding: 60px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.join-right::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 70% 30%, rgba(196,122,43,0.06) 0%, transparent 70%);
+}

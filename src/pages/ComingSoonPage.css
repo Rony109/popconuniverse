@@ -1,0 +1,65 @@
+.countdown-hero {
+  padding: 56px 80px 40px;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(196,122,43,0.08) 0%, transparent 70%),
+              linear-gradient(160deg, #0C0A08 0%, #130F06 100%);
+}
+
+.countdown-strip {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; margin-bottom: 36px;
+}
+.month-tab {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--muted); padding: 8px 18px; border-radius: 20px;
+  font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
+  user-select: none;
+}
+.month-tab.active {
+  background: var(--butter); color: #0C0A08;
+  border-color: var(--butter); font-weight: 700;
+}
+.month-tab:hover:not(.active) { border-color: var(--butter); color: var(--butter); }
+
+/* Featured film */
+.coming-feature {
+  display: grid; grid-template-columns: 1fr 220px;
+  gap: 40px; align-items: center;
+}
+.feature-badge {
+  font-family: var(--font-mono); font-size: 0.66rem;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--caramel); margin-bottom: 12px;
+}
+.feature-title {
+  font-family: var(--font-display);
+  font-size: 2.6rem; font-weight: 800;
+  letter-spacing: -0.03em; margin-bottom: 10px;
+}
+.feature-release {
+  font-size: 0.82rem; color: var(--muted); margin-bottom: 14px;
+  font-family: var(--font-mono); letter-spacing: 0.05em;
+}
+.feature-desc {
+  color: var(--muted); font-size: 0.9rem;
+  line-height: 1.75; max-width: 540px; margin-bottom: 24px;
+}
+.countdown-boxes { display: flex; gap: 12px; }
+.cd-box {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 14px 18px; text-align: center;
+  min-width: 70px;
+}
+.cd-num {
+  font-family: var(--font-display); font-size: 1.8rem; font-weight: 800;
+  color: var(--butter); line-height: 1;
+}
+.cd-label {
+  font-family: var(--font-mono); font-size: 0.58rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--muted); margin-top: 4px;
+}
+
+.coming-feature-poster {
+  font-size: 8rem; text-align: center;
+  filter: drop-shadow(0 0 40px rgba(245,200,66,0.15));
+  animation: kernelpop 4s ease-in-out infinite;
+}

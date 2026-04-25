@@ -1,0 +1,16 @@
+.page-switcher {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+  z-index: 999; display: flex; gap: 3px;
+  background: rgba(12,10,8,0.97); border: 1px solid var(--border2);
+  padding: 6px 8px; border-radius: 40px; backdrop-filter: blur(24px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(245,200,66,0.05);
+}
+
+.ps-btn {
+  padding: 7px 13px; border-radius: 30px; border: none;
+  font-family: var(--font-body); font-size: 0.72rem;
+  letter-spacing: 0.03em; cursor: pointer; transition: all 0.22s;
+  background: none; color: var(--muted); white-space: nowrap;
+}
+.ps-btn.active { background: var(--butter); color: #0C0A08; font-weight: 700; }
+.ps-btn:hover:not(.active) { color: var(--text); }

@@ -1,0 +1,103 @@
+.theatre-search-bar {
+  padding: 20px 80px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+
+.theatres-layout {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  min-height: 70vh;
+}
+
+/* ─── THEATRE LIST ─── */
+.theatres-list {
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  max-height: 80vh;
+}
+.theatre-card {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  transition: background 0.2s;
+}
+.theatre-card:hover { background: var(--surface); }
+.theatre-card.selected { background: rgba(245,200,66,0.04); border-left: 3px solid var(--butter); }
+
+.theatre-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem; font-weight: 700;
+  margin-bottom: 3px;
+}
+.theatre-chain {
+  font-family: var(--font-mono);
+  font-size: 0.6rem; letter-spacing: 0.1em;
+  color: var(--caramel); text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.theatre-addr { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }
+
+.theatre-amenities { display: flex; flex-wrap: wrap; gap: 5px; }
+.amenity-tag {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--muted); font-size: 0.62rem;
+  padding: 3px 8px; border-radius: 4px;
+  font-family: var(--font-mono); letter-spacing: 0.05em;
+}
+
+.theatre-dist {
+  font-family: var(--font-mono); font-size: 0.75rem;
+  color: var(--butter); text-align: right; margin-bottom: 4px;
+}
+.theatre-rating { font-size: 0.75rem; color: var(--muted); text-align: right; }
+.theatre-book-btn {
+  background: var(--butter); color: #0C0A08; border: none;
+  padding: 7px 14px; border-radius: 6px;
+  font-family: var(--font-display); font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.theatre-book-btn:hover { background: var(--butter-lt); }
+
+/* ─── MAP ─── */
+.theatres-map { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.map-placeholder {
+  flex: 1; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 12px;
+  position: relative; overflow: hidden;
+  min-height: 400px; display: flex; align-items: center; justify-content: center;
+}
+.map-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.4;
+}
+.loc-map-inner {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.map-gta-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem; letter-spacing: 0.2em;
+  color: var(--muted); opacity: 0.4;
+  margin-bottom: 10px;
+}
+.map-pin {
+  position: absolute;
+  font-size: 1.3rem; cursor: pointer;
+  transition: transform 0.2s;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+.map-pin:hover { transform: scale(1.3) translateY(-2px); }
+.map-label {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 18px;
+  font-size: 0.8rem; color: var(--muted);
+}

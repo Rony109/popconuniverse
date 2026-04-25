@@ -1,0 +1,59 @@
+.nav-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 48px;
+  background: rgba(12,10,8,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; cursor: pointer;
+  background: none; border: none; text-align: left;
+}
+
+.logo-icon {
+  font-size: 1.7rem; line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(245,200,66,0.5));
+  animation: kernelpop 3s ease-in-out infinite;
+}
+
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 1.3rem; font-weight: 800;
+  letter-spacing: -0.02em; line-height: 1;
+}
+.logo-text .pop { color: var(--butter); }
+.logo-text .uni { color: var(--text); }
+
+.logo-sub {
+  font-family: var(--font-mono);
+  font-size: 0.48rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--caramel);
+  display: block; margin-top: 2px;
+}
+
+.nav-links {
+  display: flex; gap: 28px; align-items: center;
+}
+.nav-links a {
+  text-decoration: none; color: var(--muted);
+  font-size: 0.83rem; letter-spacing: 0.04em;
+  transition: color 0.2s; cursor: pointer;
+}
+.nav-links a:hover,
+.nav-links a.active { color: var(--butter); }
+
+.nav-province {
+  font-family: var(--font-mono); font-size: 0.66rem;
+  color: var(--muted); background: var(--surface);
+  border: 1px solid var(--border); padding: 5px 12px;
+  border-radius: 20px; display: flex; align-items: center; gap: 6px;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.nav-province:hover { border-color: var(--butter); }
+
+.nav-right {
+  display: flex; gap: 10px; align-items: center;
+}
