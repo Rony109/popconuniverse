@@ -4,34 +4,50 @@ import Footer from '../components/Footer';
 import { NOW_PLAYING } from '../data/mockData';
 import './NowPlayingPage.css';
 
-const GENRES = ['All Genres', 'Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Romance', 'Animation', 'Thriller', 'Fantasy'];
-const AGE_RATINGS = ['All Ratings', 'G', 'PG', '14A', '18A', 'R (Restricted)'];
-const EXPERIENCES = ['IMAX', '4DX', 'DBOX', 'VIP', 'Standard', 'Français (FR)'];
-const LANGUAGES = ['English', 'French (FR)', 'Hindi', 'Korean', 'Mandarin'];
+const GENRES = [
+  'All Genres', 'Action', 'Adventure', 'Animated', 'Biography',
+  'Comedy', 'Documentary', 'Drama', 'Fantasy', 'Horror',
+  'Music', 'Mystery', 'Romance', 'Science fiction', 'Thriller',
+];
+const AGE_RATINGS = ['All Ratings', 'G', 'PG', 'PG-13', 'R', 'NR'];
 const SORT_OPTIONS = ['Popularity', 'Rating', 'Release Date', 'Alphabetical'];
 
-function NowPlayingPage({ navigate }) {
+function NowPlayingPage({ navigate, onSelectMovie }) {
   const [activeSort, setActiveSort] = useState('Popularity');
   const [checkedGenres, setCheckedGenres] = useState(['All Genres']);
   const [checkedAges, setCheckedAges] = useState(['All Ratings']);
-  const [checkedExp, setCheckedExp] = useState([]);
-  const [checkedLang, setCheckedLang] = useState(['English']);
 
-  const toggleCheck = (setter, list, value, isAll) => {
-    setter(prev => {
-      if (isAll) return [value];
-      const filtered = prev.filter(v => v !== 'All Genres' && v !== 'All Ratings');
-      if (filtered.includes(value)) return filtered.filter(v => v !== value) || ['All Genres'];
-      return [...filtered, value];
+  const toggleGenre = (g) => {
+    if (g === 'All Genres') { setCheckedGenres(['All Genres']); return; }
+    setCheckedGenres(prev => {
+      const without = prev.filter(v => v !== 'All Genres');
+      return without.includes(g) ? (without.filter(v => v !== g).length ? without.filter(v => v !== g) : ['All Genres']) : [...without, g];
     });
   };
 
-  // Sort movies based on active sort
-  const sortedMovies = [...NOW_PLAYING].sort((a, b) => {
-    if (activeSort === 'Rating') return b.rating - a.rating;
+  const toggleAge = (r) => {
+    if (r === 'All Ratings') { setCheckedAges(['All Ratings']); return; }
+    setCheckedAges(prev => {
+      const without = prev.filter(v => v !== 'All Ratings');
+      return without.includes(r) ? (without.filter(v => v !== r).length ? without.filter(v => v !== r) : ['All Ratings']) : [...without, r];
+    });
+  };
+
+  const filtered = NOW_PLAYING.filter(movie => {
+    if (!checkedGenres.includes('All Genres')) {
+      const hasGenre = (movie.genres || []).some(g => checkedGenres.includes(g));
+      if (!hasGenre) return false;
+    }
+    if (!checkedAges.includes('All Ratings')) {
+      if (!checkedAges.includes(movie.ageRating)) return false;
+    }
+    return true;
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
     if (activeSort === 'Alphabetical') return a.title.localeCompare(b.title);
-    if (activeSort === 'Release Date') return b.id - a.id;
-    return 0; // Popularity: keep default order
+    if (activeSort === 'Release Date') return new Date(b.releaseDate || 0) - new Date(a.releaseDate || 0);
+    return 0;
   });
 
   return (
@@ -39,7 +55,7 @@ function NowPlayingPage({ navigate }) {
       <div className="page-hero">
         <div className="page-hero-tag">🎬 Toronto, ON · Updated Today</div>
         <h1 className="page-hero-title">Now Playing</h1>
-        <p className="page-hero-desc">50 films showing across 12 theatres in the Greater Toronto Area this week.</p>
+        <p className="page-hero-desc">{NOW_PLAYING.length} films showing across theatres in the Greater Toronto Area this week.</p>
       </div>
 
       <div className="np-layout">
@@ -54,7 +70,7 @@ function NowPlayingPage({ navigate }) {
                 <input
                   type="checkbox"
                   checked={checkedGenres.includes(g)}
-                  onChange={() => toggleCheck(setCheckedGenres, checkedGenres, g, g === 'All Genres')}
+                  onChange={() => toggleGenre(g)}
                 />
                 {g}
               </label>
@@ -68,37 +84,9 @@ function NowPlayingPage({ navigate }) {
                 <input
                   type="checkbox"
                   checked={checkedAges.includes(r)}
-                  onChange={() => toggleCheck(setCheckedAges, checkedAges, r, r === 'All Ratings')}
+                  onChange={() => toggleAge(r)}
                 />
                 {r}
-              </label>
-            ))}
-          </div>
-
-          <div className="np-filter-group">
-            <span className="np-filter-label">Experience</span>
-            {EXPERIENCES.map(e => (
-              <label key={e} className="np-check">
-                <input
-                  type="checkbox"
-                  checked={checkedExp.includes(e)}
-                  onChange={() => setCheckedExp(prev => prev.includes(e) ? prev.filter(x => x !== e) : [...prev, e])}
-                />
-                {e}
-              </label>
-            ))}
-          </div>
-
-          <div className="np-filter-group">
-            <span className="np-filter-label">Language</span>
-            {LANGUAGES.map(l => (
-              <label key={l} className="np-check">
-                <input
-                  type="checkbox"
-                  checked={checkedLang.includes(l)}
-                  onChange={() => setCheckedLang(prev => prev.includes(l) ? prev.filter(x => x !== l) : [...prev, l])}
-                />
-                {l}
               </label>
             ))}
           </div>
@@ -117,16 +105,16 @@ function NowPlayingPage({ navigate }) {
                 {opt}
               </div>
             ))}
-            <span className="np-results-count">Showing {sortedMovies.length} of 50 films</span>
+            <span className="np-results-count">Showing {sorted.length} of {NOW_PLAYING.length} films</span>
           </div>
 
           <div className="movies-grid-4">
-            {sortedMovies.map(movie => (
+            {sorted.map(movie => (
               <MovieCard
                 key={movie.id}
                 movie={movie}
                 variant="book"
-                onAction={() => navigate('seats')}
+                onAction={() => { onSelectMovie(movie); navigate('moviedescription'); }}
               />
             ))}
           </div>

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-export const PAGES = ['home', 'nowplaying', 'comingsoon', 'theatres', 'giftcards', 'location', 'signin', 'join', 'seats', 'checkout'];
+export const PAGES = ['home', 'nowplaying', 'comingsoon', 'theatres', 'giftcards', 'location', 'signin', 'join', 'moviedescription'];
 
 export function useNavigation(initial = 'home') {
   const [currentPage, setCurrentPage] = useState(initial);

@@ -10,8 +10,6 @@ const TABS = [
   { id: 'location',   label: '📍 Location' },
   { id: 'signin',     label: 'Sign In' },
   { id: 'join',       label: 'Join Free' },
-  { id: 'seats',      label: '💺 Seats' },
-  { id: 'checkout',   label: '💳 Checkout' },
 ];
 
 function PageSwitcher({ currentPage, navigate }) {

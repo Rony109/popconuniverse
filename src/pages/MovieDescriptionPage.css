@@ -1,0 +1,279 @@
+.mdp-wrapper {
+  padding-top: 0;
+}
+
+.mdp-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: calc(100vh - 64px);
+}
+
+/* ── POSTER PANEL ── */
+.mdp-poster {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 520px;
+  padding: 24px;
+}
+
+.mdp-back {
+  position: absolute;
+  top: 88px;
+  left: 20px;
+  font-size: 0.85rem;
+  padding: 8px 14px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.mdp-back:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.mdp-poster-emoji {
+  font-size: 96px;
+  line-height: 1;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
+}
+
+.mdp-age-badge {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+/* ── DETAIL PANEL ── */
+.mdp-detail {
+  padding: 80px 56px 56px;
+  overflow-y: auto;
+}
+
+.mdp-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 12px;
+  line-height: 1.15;
+}
+
+.mdp-meta {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.mdp-badges {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.mdp-rating {
+  background: var(--surface2, #1e1e1e);
+  color: var(--butter);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: 'Space Mono', monospace;
+}
+
+.mdp-age {
+  background: var(--surface2, #1e1e1e);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.mdp-synopsis {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text);
+  max-width: 620px;
+  margin: 0 0 32px;
+}
+
+.mdp-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 28px 0;
+}
+
+.mdp-details-grid {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 12px 20px;
+  max-width: 480px;
+  margin-bottom: 8px;
+}
+
+.mdp-detail-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding-top: 2px;
+}
+
+.mdp-detail-value {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ── EXPERIENCES ── */
+.mdp-experiences {
+  margin-bottom: 36px;
+}
+
+.mdp-experiences .mdp-detail-label {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.mdp-exp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mdp-exp-tag {
+  background: var(--surface2, #1e1e1e);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 20px;
+}
+
+/* ── CTA ── */
+.mdp-cta {
+  font-size: 1rem;
+  padding: 14px 32px;
+}
+
+/* ── SHOWTIMES ── */
+.mdp-showtimes-section {
+  margin-bottom: 8px;
+}
+
+.mdp-section-heading {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.mdp-showtime-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mdp-showtime-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mdp-st-theatre {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mdp-st-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mdp-st-time-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2, #1e1e1e);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-family: 'Space Mono', monospace;
+  color: var(--text);
+}
+
+.mdp-st-format {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--butter);
+  background: rgba(196, 122, 43, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.mdp-year {
+  background: var(--surface2, #1e1e1e);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+/* ── EMPTY STATE ── */
+.mdp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-height: 60vh;
+  color: var(--muted);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .mdp-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .mdp-poster {
+    min-height: 280px;
+  }
+
+  .mdp-poster-emoji {
+    font-size: 72px;
+  }
+
+  .mdp-detail {
+    padding: 32px 24px 48px;
+  }
+
+  .mdp-title {
+    font-size: 1.8rem;
+  }
+}

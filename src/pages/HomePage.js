@@ -24,7 +24,7 @@ function ReelCard({ cls, label }) {
   );
 }
 
-function HomePage({ navigate }) {
+function HomePage({ navigate, onSelectMovie }) {
   const reelCols = [
     REEL_POSTERS.slice(0, 3),
     REEL_POSTERS.slice(3, 6),
@@ -117,7 +117,7 @@ function HomePage({ navigate }) {
               key={movie.id}
               movie={movie}
               variant="book"
-              onAction={() => navigate('seats')}
+              onAction={() => { onSelectMovie(NOW_PLAYING.find(m => m.id === movie.id) || movie); navigate('moviedescription'); }}
             />
           ))}
         </div>
@@ -162,7 +162,7 @@ function HomePage({ navigate }) {
               key={movie.id}
               movie={movie}
               variant="book"
-              onAction={() => navigate('seats')}
+              onAction={() => { onSelectMovie(movie); navigate('moviedescription'); }}
             />
           ))}
         </div>

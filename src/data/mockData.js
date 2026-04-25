@@ -1,7 +1,9 @@
-// ─── MOVIE DATA ───
-// Replace these with API calls to your backend
+import MOVIES_RAW from './movies.json';
+import THEATRES_RAW from './theatres.json';
 
+// ─── POSTER GRADIENTS (keyed by genre for real data) ───
 export const POSTER_GRADIENTS = {
+  // Legacy keys
   mp1:  'linear-gradient(155deg,#1a0b26,#4a2080)',
   mp2:  'linear-gradient(155deg,#091828,#204880)',
   mp3:  'linear-gradient(155deg,#281200,#803000)',
@@ -14,43 +16,171 @@ export const POSTER_GRADIENTS = {
   mp10: 'linear-gradient(155deg,#001408,#003020)',
   mp11: 'linear-gradient(155deg,#0e0e26,#282860)',
   mp12: 'linear-gradient(155deg,#200a00,#602000)',
+  // Genre-based keys
+  'Animated':          'linear-gradient(155deg,#002818,#006040)',
+  'Science fiction':   'linear-gradient(155deg,#040810,#0a1850)',
+  'Action':            'linear-gradient(155deg,#1a0400,#600808)',
+  'Horror':            'linear-gradient(155deg,#060606,#200008)',
+  'Comedy':            'linear-gradient(155deg,#1a1400,#605000)',
+  'Drama':             'linear-gradient(155deg,#000c18,#002848)',
+  'Thriller':          'linear-gradient(155deg,#080010,#220038)',
+  'Romance':           'linear-gradient(155deg,#16000c,#500038)',
+  'Romantic comedy':   'linear-gradient(155deg,#180010,#500040)',
+  'Biography':         'linear-gradient(155deg,#0e0900,#3c2808)',
+  'Music':             'linear-gradient(155deg,#120018,#400058)',
+  'Fantasy':           'linear-gradient(155deg,#080818,#202278)',
+  'Adventure':         'linear-gradient(155deg,#001810,#004030)',
+  'Documentary':       'linear-gradient(155deg,#090908,#2a2810)',
+  'Mystery':           'linear-gradient(155deg,#050508,#141428)',
+  'Family':            'linear-gradient(155deg,#001608,#004c1c)',
+  'Children':          'linear-gradient(155deg,#001208,#003818)',
+  'War':               'linear-gradient(155deg,#0c0c08,#303018)',
+  'Crime drama':       'linear-gradient(155deg,#0e0606,#38140e)',
+  'Dark comedy':       'linear-gradient(155deg,#100c00,#362600)',
+  'Historical drama':  'linear-gradient(155deg,#0e0800,#362200)',
+  'Musical comedy':    'linear-gradient(155deg,#140010,#3c0038)',
+  'LGBTQ':             'linear-gradient(155deg,#10001a,#3a0050)',
+  'Comedy drama':      'linear-gradient(155deg,#080c14,#202840)',
+  'Anime':             'linear-gradient(155deg,#1a0010,#60003a)',
+  'Blues':             'linear-gradient(155deg,#000c18,#002850)',
+  'Country':           'linear-gradient(155deg,#100a00,#3c2800)',
+  'Gospel':            'linear-gradient(155deg,#100800,#403000)',
+  'Pop':               'linear-gradient(155deg,#14001a,#480058)',
+  'R&B':               'linear-gradient(155deg,#0c0018,#300050)',
+  'Rock':              'linear-gradient(155deg,#100000,#400008)',
+  'Soul':              'linear-gradient(155deg,#0a0014,#280044)',
+  'Funk':              'linear-gradient(155deg,#100c00,#402c00)',
+  default:             'linear-gradient(155deg,#080810,#181828)',
 };
 
-export const NOW_PLAYING = [
-  { id: 1, title: 'Nebula Protocol',  genre: 'Sci-Fi · Action',   runtime: '2h 22m', rating: 8.7, ageRating: '14A', emoji: '🌌', poster: 'mp1' },
-  { id: 2, title: 'Frozen Meridian',  genre: 'Thriller · Drama',  runtime: '1h 58m', rating: 7.4, ageRating: 'PG',  emoji: '🧊', poster: 'mp2' },
-  { id: 3, title: 'Crimson Throne',   genre: 'Fantasy · Epic',    runtime: '2h 47m', rating: 9.1, ageRating: '18A', emoji: '🐉', poster: 'mp3' },
-  { id: 4, title: "Eden's Edge",      genre: 'Drama · Romance',   runtime: '2h 05m', rating: 7.9, ageRating: 'G',   emoji: '🌿', poster: 'mp4' },
-  { id: 5, title: 'Storm Atlas',      genre: 'Action · Adventure',runtime: '2h 15m', rating: 8.2, ageRating: '14A', emoji: '⚡', poster: 'mp5' },
-  { id: 6, title: 'The Last Cipher',  genre: 'Mystery · Thriller',runtime: '1h 48m', rating: 7.6, ageRating: 'PG',  emoji: '🕵️', poster: 'mp6' },
-  { id: 7, title: 'Masquerade',       genre: 'Drama · Art',       runtime: '2h 18m', rating: 8.0, ageRating: '14A', emoji: '🎭', poster: 'mp7' },
-  { id: 8, title: 'Peak Pursuit',     genre: 'Adventure · Family',runtime: '1h 55m', rating: 7.2, ageRating: 'G',   emoji: '🏔️', poster: 'mp8' },
-  { id: 9, title: 'Tidal Force',      genre: 'Sci-Fi · Drama',    runtime: '2h 30m', rating: 8.5, ageRating: '14A', emoji: '🌊', poster: 'mp9' },
-  { id: 10, title: 'Circus of Souls', genre: 'Comedy · Fantasy',  runtime: '1h 40m', rating: 6.8, ageRating: 'PG',  emoji: '🎪', poster: 'mp10' },
-  { id: 11, title: 'Void Prophecy',   genre: 'Sci-Fi · Horror',   runtime: '2h 08m', rating: 8.9, ageRating: '18A', emoji: '🔮', poster: 'mp11' },
-  { id: 12, title: 'The Clever Fox',  genre: 'Animation · Comedy',runtime: '1h 32m', rating: 7.1, ageRating: 'G',   emoji: '🦊', poster: 'mp12' },
-];
+// ─── HELPERS ───
+function parseRuntime(pt) {
+  if (!pt) return '';
+  const m = pt.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
+  if (!m) return '';
+  return [m[1] && m[1] + 'h', m[2] && m[2] + 'm'].filter(Boolean).join(' ');
+}
 
+function langDisplay(code) {
+  const map = { en: 'English', 'en-GB': 'English', 'fr-CA': 'French', 'fr-FR': 'French', 'es-ES': 'Spanish', it: 'Italian', pa: 'Punjabi', ml: 'Malayalam', pl: 'Polish', vi: 'Vietnamese' };
+  return map[code] || 'English';
+}
+
+const GENRE_EMOJI = {
+  'Animated': '🎨', 'Science fiction': '🚀', 'Action': '💥', 'Horror': '👻',
+  'Comedy': '😄', 'Drama': '🎭', 'Thriller': '🕵️', 'Romance': '❤️',
+  'Romantic comedy': '💕', 'Biography': '📖', 'Music': '🎵', 'Fantasy': '✨',
+  'Adventure': '🗺️', 'Documentary': '🎥', 'Mystery': '🔍', 'Family': '🌟',
+  'Children': '🌈', 'War': '⚔️', 'Crime drama': '🔫', 'Dark comedy': '😈',
+  'Historical drama': '🏛️', 'Musical comedy': '🎪', 'LGBTQ': '🏳️‍🌈',
+  'Anime': '⛩️', 'Music': '🎶', 'Comedy drama': '🎭',
+};
+
+function theatreChain(name) {
+  if (/cineplex|scotiabank/i.test(name)) return 'CINEPLEX · Scene+';
+  if (/landmark/i.test(name)) return 'LANDMARK';
+  if (/rainbow/i.test(name)) return 'RAINBOW';
+  if (/tiff/i.test(name)) return 'TIFF';
+  if (/imax/i.test(name)) return 'IMAX Theatre';
+  return 'Independent';
+}
+
+function theatreAmenities(name) {
+  const tags = [];
+  if (/imax/i.test(name)) tags.push('IMAX');
+  if (/vip/i.test(name)) tags.push('VIP');
+  if (/ultraavx|avx/i.test(name)) tags.push('UltraAVX');
+  if (tags.length === 0) tags.push('Standard');
+  tags.push('♿ Accessible');
+  return tags;
+}
+
+// ─── NOW PLAYING (all 132 movies from JSON) ───
+export const NOW_PLAYING = MOVIES_RAW.map((m, i) => {
+  const genres = m.genres || [];
+  const g1 = genres[0] || 'Drama';
+  const g2 = genres[1];
+  const genreStr = g2 ? `${g1} · ${g2}` : g1;
+  return {
+    id: m.tmsId,
+    title: m.title,
+    genre: genreStr,
+    genres,
+    runtime: parseRuntime(m.runTime),
+    releaseYear: m.releaseYear,
+    releaseDate: m.releaseDate,
+    ageRating: m.ratings?.[0]?.code || 'NR',
+    emoji: GENRE_EMOJI[g1] || '🎬',
+    poster: g1,
+    language: langDisplay(m.titleLang),
+    director: m.directors?.[0] || '',
+    cast: m.topCast || [],
+    synopsis: m.longDescription || m.shortDescription || '',
+    showtimes: (m.showtimes || []).map(s => ({
+      theatreId: s.theatre.id,
+      theatreName: s.theatre.name,
+      dateTime: s.dateTime,
+      format: s.quals || '',
+    })),
+  };
+});
+
+// ─── FEATURED HOME (first 5 movies with badges) ───
+const BADGE_DEFS = [
+  { badge: 'HOT', badgeType: 'badge-hot' },
+  { badge: 'NEW', badgeType: 'badge-new' },
+  { badge: 'TRENDING', badgeType: 'badge-genre' },
+  {},
+  {},
+];
+export const FEATURED_HOME = NOW_PLAYING.slice(0, 5).map((m, i) => ({ ...m, ...BADGE_DEFS[i] }));
+
+// ─── THEATRES (from JSON, only those with active showtimes) ───
+const THEATRE_MAP = new Map(THEATRES_RAW.map(t => [t.theatreId, t]));
+const ACTIVE_IDS = [...new Set(MOVIES_RAW.flatMap(m => (m.showtimes || []).map(s => s.theatre.id)))];
+
+export const THEATRES = ACTIVE_IDS
+  .map(id => THEATRE_MAP.get(id))
+  .filter(Boolean)
+  .sort((a, b) => a.location.distance - b.location.distance)
+  .map(t => {
+    const addr = t.location.address;
+    return {
+      id: t.theatreId,
+      name: t.name,
+      chain: theatreChain(t.name),
+      address: `${addr.street}, ${addr.city}, ${addr.state} ${addr.postalCode}`,
+      postalCode: addr.postalCode,
+      city: addr.city,
+      phone: t.location.telephone,
+      distance: `${t.location.distance.toFixed(1)} km`,
+      geoCode: t.location.geoCode,
+      amenities: theatreAmenities(t.name),
+      rating: '',
+    };
+  });
+
+// ─── COMING SOON (kept as curated mock data) ───
 export const COMING_SOON_MARCH = [
-  { id: 101, title: 'Velvet Echo',    genre: 'Romance · Mystery', runtime: '2h 10m', ageRating: 'PG',  emoji: '🌹', poster: 'mp6', releaseDate: 'Mar 7' },
-  { id: 102, title: 'Silicon Gods',   genre: 'Sci-Fi · Thriller', runtime: '2h 35m', ageRating: '14A', emoji: '🤖', poster: 'mp7', releaseDate: 'Mar 21', canPreorder: true },
-  { id: 103, title: 'Blue Beyond',    genre: 'Animation · Family',runtime: '1h 48m', ageRating: 'G',   emoji: '🌊', poster: 'mp2', releaseDate: 'Mar 28' },
-  { id: 104, title: 'Iron Epoch',     genre: 'Action · History',  runtime: '2h 52m', ageRating: '18A', emoji: '🗡️', poster: 'mp1', releaseDate: 'Mar 14' },
-  { id: 105, title: 'Noise & Silence',genre: 'Musical · Drama',   runtime: '2h 05m', ageRating: '14A', emoji: '🎵', poster: 'mp3', releaseDate: 'Mar 21' },
+  { id: 101, title: 'Velvet Echo',     genre: 'Romance · Mystery', runtime: '2h 10m', ageRating: 'PG',  emoji: '🌹', poster: 'Romance',           releaseDate: 'Mar 7' },
+  { id: 102, title: 'Silicon Gods',    genre: 'Sci-Fi · Thriller',  runtime: '2h 35m', ageRating: 'PG-13', emoji: '🤖', poster: 'Science fiction', releaseDate: 'Mar 21', canPreorder: true },
+  { id: 103, title: 'Blue Beyond',     genre: 'Animated · Family',  runtime: '1h 48m', ageRating: 'G',   emoji: '🌊', poster: 'Animated',          releaseDate: 'Mar 28' },
+  { id: 104, title: 'Iron Epoch',      genre: 'Action · History',   runtime: '2h 52m', ageRating: 'R',   emoji: '🗡️', poster: 'Action',            releaseDate: 'Mar 14' },
+  { id: 105, title: 'Noise & Silence', genre: 'Musical · Drama',    runtime: '2h 05m', ageRating: 'PG-13', emoji: '🎵', poster: 'Music',           releaseDate: 'Mar 21' },
 ];
 
 export const COMING_SOON_APRIL = [
-  { id: 201, title: 'Desert Bloom',       genre: 'Drama · Adventure',    runtime: '1h 52m', ageRating: 'PG',  emoji: '☀️', poster: 'mp8', releaseDate: 'Apr 4' },
-  { id: 202, title: 'The Hollow Dark',    genre: 'Horror · Supernatural',runtime: '2h 02m', ageRating: '18A', emoji: '👻', poster: 'mp9', releaseDate: 'Apr 18' },
-  { id: 203, title: 'King of the Wild',   genre: 'Animation · Family',   runtime: '1h 44m', ageRating: 'G',   emoji: '🦁', poster: 'mp10', releaseDate: 'Apr 25' },
-  { id: 204, title: "Warlord's Last Stand",genre: 'Action · Epic',        runtime: '2h 40m', ageRating: '14A', emoji: '⚔️', poster: 'mp11', releaseDate: 'Apr 11' },
-  { id: 205, title: 'Moonfall Express',   genre: 'Mystery · Sci-Fi',     runtime: '1h 58m', ageRating: 'PG',  emoji: '🌙', poster: 'mp12', releaseDate: 'Apr 30' },
+  { id: 201, title: 'Desert Bloom',        genre: 'Drama · Adventure',      runtime: '1h 52m', ageRating: 'PG',  emoji: '☀️',  poster: 'Adventure',  releaseDate: 'Apr 4' },
+  { id: 202, title: 'The Hollow Dark',     genre: 'Horror · Supernatural',  runtime: '2h 02m', ageRating: 'R',   emoji: '👻',  poster: 'Horror',     releaseDate: 'Apr 18' },
+  { id: 203, title: 'King of the Wild',    genre: 'Animated · Family',      runtime: '1h 44m', ageRating: 'G',   emoji: '🦁',  poster: 'Animated',   releaseDate: 'Apr 25' },
+  { id: 204, title: "Warlord's Last Stand",genre: 'Action · Epic',          runtime: '2h 40m', ageRating: 'PG-13', emoji: '⚔️', poster: 'Action',   releaseDate: 'Apr 11' },
+  { id: 205, title: 'Moonfall Express',    genre: 'Mystery · Sci-Fi',       runtime: '1h 58m', ageRating: 'PG',  emoji: '🌙',  poster: 'Mystery',    releaseDate: 'Apr 30' },
 ];
 
 export const FEATURED_FILM = {
   title: 'Silicon Gods',
   release: 'March 21, 2026',
-  ageRating: '14A',
+  ageRating: 'PG-13',
   runtime: '2h 35m',
   tagline: 'MOST ANTICIPATED',
   description: 'In a near-future Toronto, a rogue AI collective redefines the line between creator and creation. The most talked-about film of 2026 — from director Anya Kowalczyk, filmed entirely in Canada.',
@@ -58,80 +188,10 @@ export const FEATURED_FILM = {
   countdown: { days: 32, hours: 8, mins: 45, secs: 12 },
 };
 
-// ─── THEATRE DATA ───
-export const THEATRES = [
-  {
-    id: 1,
-    name: 'Cineplex Cinemas Yonge-Eglinton',
-    chain: 'CINEPLEX · Scene+ Partner',
-    address: '2300 Yonge St, Toronto, ON M4P 2W6',
-    distance: '1.8 km',
-    rating: '★★★★½',
-    amenities: ['IMAX', '4DX', 'DBOX', 'VIP', '♿ Accessible', '🅿️ Parking'],
-  },
-  {
-    id: 2,
-    name: 'Scotiabank Theatre Toronto',
-    chain: 'CINEPLEX · Scene+ Partner',
-    address: '259 Richmond St W, Toronto, ON M5V 3M6',
-    distance: '4.2 km',
-    rating: '★★★★',
-    amenities: ['IMAX', 'UltraAVX', 'VIP', '♿ Accessible'],
-  },
-  {
-    id: 3,
-    name: 'SilverCity Mississauga Cinemas',
-    chain: 'LANDMARK · Scene+ Partner',
-    address: '1177 Central Pkwy W, Mississauga, ON L5C 4P3',
-    distance: '8.4 km',
-    rating: '★★★½',
-    amenities: ['DBOX', 'VIP', 'Standard', '♿ Accessible', '🅿️ Parking'],
-  },
-  {
-    id: 4,
-    name: 'Cineplex Odeon Eglinton Town Centre',
-    chain: 'CINEPLEX · Scene+ Partner',
-    address: '22 Lebovic Ave, Scarborough, ON M1L 4V9',
-    distance: '12.1 km',
-    rating: '★★★★',
-    amenities: ['Standard', 'VIP', 'FR Available', '♿ Accessible'],
-  },
-  {
-    id: 5,
-    name: 'Rainbow Cinemas Market Square',
-    chain: 'RAINBOW · Independent',
-    address: '80 Front St E, Toronto, ON M5E 1T4',
-    distance: '5.6 km',
-    rating: '★★★',
-    amenities: ['Standard', 'Budget Pricing', '♿ Accessible'],
-  },
-];
-
-// ─── FEATURED MOVIES FOR HOME PAGE ───
-export const FEATURED_HOME = [
-  { id: 1, title: 'Nebula Protocol', genre: 'Sci-Fi · Action', runtime: '2h 22m', rating: 8.7, ageRating: '14A', emoji: '🌌', poster: 'mp1', badge: 'HOT', badgeType: 'badge-hot' },
-  { id: 3, title: 'Crimson Throne',  genre: 'Fantasy · Epic',  runtime: '2h 47m', rating: 9.1, ageRating: '18A', emoji: '🐉', poster: 'mp3', badge: 'TOP RATED', badgeType: 'badge-genre' },
-  { id: 11, title: 'Void Prophecy', genre: 'Sci-Fi · Horror',  runtime: '2h 08m', rating: 8.9, ageRating: '18A', emoji: '🔮', poster: 'mp11', badge: 'NEW', badgeType: 'badge-new' },
-  { id: 9, title: 'Tidal Force',    genre: 'Sci-Fi · Drama',   runtime: '2h 30m', rating: 8.5, ageRating: '14A', emoji: '🌊', poster: 'mp9', badge: 'TRENDING', badgeType: 'badge-genre' },
-  { id: 5, title: 'Storm Atlas',    genre: 'Action · Adventure',runtime:'2h 15m', rating: 8.2, ageRating: '14A', emoji: '⚡', poster: 'mp5' },
-];
-
 // ─── GIFT CARD DESIGNS ───
 export const GIFT_CARD_DESIGNS = [
   { id: 1, amount: 25,  gradient: 'linear-gradient(135deg,#1a0b26,#8B4F10,#C47A2B)', tagline: 'Movie Magic Gift Card' },
   { id: 2, amount: 50,  gradient: 'linear-gradient(135deg,#091828,#004060,#C47A2B)', tagline: 'Movie Magic Gift Card' },
   { id: 3, amount: 100, gradient: 'linear-gradient(135deg,#1c0018,#600040,#C47A2B)', tagline: 'Movie Magic Gift Card' },
   { id: 4, amount: 150, gradient: 'linear-gradient(135deg,#0e0e26,#282860,#C47A2B)', tagline: 'Movie Magic Gift Card' },
-];
-
-// ─── SEAT MAP DATA ───
-// 'p' = premium, 'taken' = taken, 'sel' = pre-selected, '' = standard
-export const SEAT_ROWS = [
-  { label: 'A', seats: ['p','p','p','GAP','p','p-sel','p-sel','p','p','p','GAP','p','p','p'] },
-  { label: 'B', seats: ['p','p','p','GAP','p-taken','p-taken','p','p','p','p','GAP','p','p','p'] },
-  { label: 'C', seats: ['','','','','GAP','taken','taken','','','','','GAP','','','',''] },
-  { label: 'D', seats: ['','','','','GAP','','','taken','taken','taken','','GAP','','','',''] },
-  { label: 'E', seats: ['','','','','GAP','','','','','','','GAP','','','',''] },
-  { label: 'F', seats: ['','taken','taken','','GAP','','','','taken','','','GAP','taken','taken','',''] },
-  { label: 'G', seats: ['','','','','GAP','taken','','','','','taken','GAP','','','',''] },
 ];

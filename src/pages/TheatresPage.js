@@ -4,20 +4,23 @@ import { THEATRES } from '../data/mockData';
 import './TheatresPage.css';
 
 function TheatresPage({ navigate }) {
-  const [selectedId, setSelectedId] = useState(1);
+  const [selectedId, setSelectedId] = useState(null);
   const [search, setSearch] = useState('');
 
   const filtered = THEATRES.filter(t =>
     t.name.toLowerCase().includes(search.toLowerCase()) ||
-    t.address.toLowerCase().includes(search.toLowerCase())
+    t.address.toLowerCase().includes(search.toLowerCase()) ||
+    t.postalCode.toLowerCase().includes(search.toLowerCase())
   );
+
+  const selected = THEATRES.find(t => t.id === selectedId) || filtered[0];
 
   return (
     <div className="page-wrapper">
       <div className="page-hero">
-        <div className="page-hero-tag">📍 Toronto, ON · 12 Theatres Found</div>
+        <div className="page-hero-tag">📍 Toronto, ON · {THEATRES.length} Theatres Found</div>
         <h1 className="page-hero-title">Theatres Near You</h1>
-        <p className="page-hero-desc">Find your nearest Cineplex, Landmark, or independent cinema. Real-time seat availability shown.</p>
+        <p className="page-hero-desc">Find your nearest cinema. Search by name, postal code, or neighbourhood.</p>
       </div>
 
       {/* Search bar */}
@@ -46,6 +49,7 @@ function TheatresPage({ navigate }) {
                 <div className="theatre-name">{theatre.name}</div>
                 <div className="theatre-chain">{theatre.chain}</div>
                 <div className="theatre-addr">{theatre.address}</div>
+                {theatre.phone && <div className="theatre-phone">{theatre.phone}</div>}
                 <div className="theatre-amenities">
                   {theatre.amenities.map(a => (
                     <span key={a} className="amenity-tag">{a}</span>
@@ -54,17 +58,21 @@ function TheatresPage({ navigate }) {
               </div>
               <div>
                 <div className="theatre-dist">{theatre.distance}</div>
-                <div className="theatre-rating">{theatre.rating}</div>
                 <button
                   className="theatre-book-btn"
                   style={{ marginTop: 10 }}
-                  onClick={e => { e.stopPropagation(); navigate('seats'); }}
+                  onClick={e => { e.stopPropagation(); navigate('nowplaying'); }}
                 >
-                  Book Now
+                  See Films
                 </button>
               </div>
             </div>
           ))}
+          {filtered.length === 0 && (
+            <div style={{ padding: '24px', color: 'var(--muted)', textAlign: 'center' }}>
+              No theatres match your search.
+            </div>
+          )}
         </div>
 
         {/* Map placeholder */}
@@ -74,18 +82,41 @@ function TheatresPage({ navigate }) {
             <div className="loc-map-inner">
               <div style={{ textAlign: 'center', position: 'relative' }}>
                 <div className="map-gta-label">Greater Toronto Area</div>
-                <div className="map-pin" style={{ top: '-80px', left: '20px' }} title="Yonge-Eglinton">📍</div>
-                <div className="map-pin" style={{ top: '-20px', left: '-60px' }} title="Scotiabank">📍</div>
-                <div className="map-pin" style={{ top: '40px', left: '-100px' }} title="Mississauga">📍</div>
-                <div className="map-pin" style={{ top: '-60px', left: '80px' }} title="Eglinton">📍</div>
-                <div className="map-pin" style={{ top: '10px', left: '40px' }} title="Market Square">📍</div>
+                {filtered.slice(0, 8).map((t, i) => {
+                  const positions = [
+                    { top: '-80px', left: '20px' }, { top: '-20px', left: '-60px' },
+                    { top: '40px', left: '-100px' }, { top: '-60px', left: '80px' },
+                    { top: '10px', left: '40px' },   { top: '-100px', left: '-20px' },
+                    { top: '50px', left: '60px' },   { top: '-40px', left: '-80px' },
+                  ];
+                  const pos = positions[i] || { top: `${-40 + i * 10}px`, left: `${-40 + i * 15}px` };
+                  return (
+                    <div
+                      key={t.id}
+                      className={`map-pin ${selected?.id === t.id ? 'active' : ''}`}
+                      style={pos}
+                      title={t.name}
+                      onClick={() => setSelectedId(t.id)}
+                    >
+                      📍
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
-          <div className="map-label">
-            <p>📍 Interactive map — select a theatre to see its location</p>
-            <p style={{ marginTop: 6, fontSize: '0.72rem' }}>Live availability updates every 5 minutes</p>
-          </div>
+          {selected && (
+            <div className="map-label">
+              <p style={{ fontWeight: 600 }}>📍 {selected.name}</p>
+              <p style={{ marginTop: 4, fontSize: '0.82rem', color: 'var(--muted)' }}>{selected.address}</p>
+              {selected.phone && <p style={{ marginTop: 2, fontSize: '0.78rem', color: 'var(--muted)' }}>{selected.phone}</p>}
+            </div>
+          )}
+          {!selected && (
+            <div className="map-label">
+              <p>📍 Select a theatre to see its details</p>
+            </div>
+          )}
         </div>
       </div>
 
