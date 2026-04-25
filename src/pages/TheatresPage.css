@@ -1,8 +1,60 @@
 .theatre-search-bar {
-  padding: 20px 80px;
+  padding: 16px 80px;
   background: var(--bg2);
   border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
+
+/* GPS button */
+.gps-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+.gps-btn:hover:not(:disabled) {
+  background: var(--surface2);
+  border-color: var(--butter);
+}
+.gps-btn.success {
+  border-color: var(--butter);
+  color: var(--butter);
+}
+.gps-btn.denied,
+.gps-btn.error,
+.gps-btn.unsupported {
+  border-color: var(--red);
+  color: var(--red);
+}
+.gps-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* GPS status label */
+.gps-status {
+  font-size: 0.76rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.gps-status--success     { color: var(--butter); background: rgba(245,200,66,0.1); }
+.gps-status--loading     { color: var(--muted);  background: var(--surface); }
+.gps-status--denied,
+.gps-status--error,
+.gps-status--unsupported { color: var(--red);    background: rgba(200,50,50,0.1); }
 
 .theatres-layout {
   display: grid;

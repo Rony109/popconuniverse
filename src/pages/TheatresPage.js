@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Footer from '../components/Footer';
 import { THEATRES, MOVIES_BY_THEATRE, POSTER_GRADIENTS } from '../data/mockData';
 import './TheatresPage.css';
@@ -11,19 +11,81 @@ function formatTime(dateTimeStr) {
   return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
 }
 
+// Haversine great-circle distance in km
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const toRad = deg => deg * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+const GPS_LABELS = {
+  idle:        null,
+  loading:     'Getting your location…',
+  success:     'Sorted by distance from you',
+  denied:      'Location access was denied',
+  error:       'Could not get your location',
+  unsupported: 'GPS not supported in this browser',
+};
+
 function TheatresPage({ navigate }) {
-  const [selectedId, setSelectedId] = useState(null);
-  const [search, setSearch] = useState('');
-  const [imgErrors, setImgErrors] = useState({});
+  const [selectedId, setSelectedId]   = useState(null);
+  const [search, setSearch]           = useState('');
+  const [imgErrors, setImgErrors]     = useState({});
+  const [userLocation, setUserLocation] = useState(null);   // { lat, lon }
+  const [gpsStatus, setGpsStatus]     = useState('idle');   // idle|loading|success|denied|error|unsupported
 
-  const filtered = THEATRES.filter(t =>
-    t.name.toLowerCase().includes(search.toLowerCase()) ||
-    t.address.toLowerCase().includes(search.toLowerCase()) ||
-    t.postalCode.toLowerCase().includes(search.toLowerCase())
-  );
+  function handleUseMyLocation() {
+    if (!navigator.geolocation) {
+      setGpsStatus('unsupported');
+      return;
+    }
+    setGpsStatus('loading');
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        setUserLocation({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+        setGpsStatus('success');
+      },
+      err => {
+        setGpsStatus(err.code === err.PERMISSION_DENIED ? 'denied' : 'error');
+      },
+      { timeout: 10000, maximumAge: 60000 }
+    );
+  }
 
-  const selected = THEATRES.find(t => t.id === selectedId) || null;
+  // Build the sorted+filtered list, recalculating distances when userLocation changes
+  const displayTheatres = useMemo(() => {
+    let list = THEATRES.filter(t =>
+      t.name.toLowerCase().includes(search.toLowerCase()) ||
+      t.address.toLowerCase().includes(search.toLowerCase()) ||
+      t.postalCode.toLowerCase().includes(search.toLowerCase())
+    );
+
+    if (userLocation) {
+      list = list
+        .map(t => ({
+          ...t,
+          computedDist: haversine(
+            userLocation.lat, userLocation.lon,
+            parseFloat(t.geoCode.latitude),
+            parseFloat(t.geoCode.longitude)
+          ),
+        }))
+        .sort((a, b) => a.computedDist - b.computedDist);
+    }
+
+    return list;
+  }, [search, userLocation]);
+
+  const selected   = THEATRES.find(t => t.id === selectedId) || null;
   const nowPlaying = selected ? (MOVIES_BY_THEATRE[selected.id] || []) : [];
+
+  // Distance label: computed from GPS if available, else from JSON default
+  const distLabel = t =>
+    t.computedDist !== undefined ? `${t.computedDist.toFixed(1)} km` : t.distance;
 
   return (
     <div className="page-wrapper">
@@ -33,6 +95,7 @@ function TheatresPage({ navigate }) {
         <p className="page-hero-desc">Find your nearest cinema. Search by name, postal code, or neighbourhood.</p>
       </div>
 
+      {/* ── SEARCH + LOCATION BAR ── */}
       <div className="theatre-search-bar">
         <div className="search-bar" style={{ maxWidth: 500, marginBottom: 0 }}>
           <input
@@ -43,12 +106,27 @@ function TheatresPage({ navigate }) {
           />
           <button className="search-btn">⌕</button>
         </div>
+
+        <button
+          className={`gps-btn ${gpsStatus}`}
+          onClick={handleUseMyLocation}
+          disabled={gpsStatus === 'loading'}
+        >
+          {gpsStatus === 'loading' ? '⏳' : '📍'}
+          {gpsStatus === 'loading' ? ' Locating…' : ' Use My Location'}
+        </button>
+
+        {GPS_LABELS[gpsStatus] && (
+          <span className={`gps-status gps-status--${gpsStatus}`}>
+            {GPS_LABELS[gpsStatus]}
+          </span>
+        )}
       </div>
 
       <div className="theatres-layout">
         {/* ── THEATRE LIST ── */}
         <div className="theatres-list">
-          {filtered.map(theatre => (
+          {displayTheatres.map(theatre => (
             <div
               key={theatre.id}
               className={`theatre-card ${selectedId === theatre.id ? 'selected' : ''}`}
@@ -66,14 +144,14 @@ function TheatresPage({ navigate }) {
                 </div>
               </div>
               <div className="theatre-card-right">
-                <div className="theatre-dist">{theatre.distance}</div>
+                <div className="theatre-dist">{distLabel(theatre)}</div>
                 <div className="theatre-film-count">
                   {(MOVIES_BY_THEATRE[theatre.id] || []).length} films
                 </div>
               </div>
             </div>
           ))}
-          {filtered.length === 0 && (
+          {displayTheatres.length === 0 && (
             <div style={{ padding: '24px', color: 'var(--muted)', textAlign: 'center' }}>
               No theatres match your search.
             </div>
@@ -84,7 +162,6 @@ function TheatresPage({ navigate }) {
         <div className="theatre-detail-panel">
           {selected ? (
             <>
-              {/* Theatre header */}
               <div className="tdp-header">
                 <div>
                   <div className="tdp-name">{selected.name}</div>
@@ -92,7 +169,11 @@ function TheatresPage({ navigate }) {
                   <div className="tdp-address">📍 {selected.address}</div>
                   {selected.phone && <div className="tdp-phone">📞 {selected.phone}</div>}
                 </div>
-                <div className="tdp-dist">{selected.distance}</div>
+                <div className="tdp-dist">
+                  {displayTheatres.find(t => t.id === selected.id)
+                    ? distLabel(displayTheatres.find(t => t.id === selected.id))
+                    : selected.distance}
+                </div>
               </div>
 
               <div className="tdp-amenities">
@@ -103,7 +184,6 @@ function TheatresPage({ navigate }) {
 
               <div className="tdp-divider" />
 
-              {/* Now playing at this theatre */}
               <div className="tdp-section-heading">
                 Now Playing · {nowPlaying.length} film{nowPlaying.length !== 1 ? 's' : ''}
               </div>
