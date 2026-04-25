@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
 import Footer from '../components/Footer';
-import { THEATRES } from '../data/mockData';
+import { THEATRES, MOVIES_BY_THEATRE, POSTER_GRADIENTS } from '../data/mockData';
 import './TheatresPage.css';
+
+function formatTime(dateTimeStr) {
+  const timePart = dateTimeStr.split('T')[1] || dateTimeStr;
+  const [h, m] = timePart.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+}
 
 function TheatresPage({ navigate }) {
   const [selectedId, setSelectedId] = useState(null);
   const [search, setSearch] = useState('');
+  const [imgErrors, setImgErrors] = useState({});
 
   const filtered = THEATRES.filter(t =>
     t.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -13,17 +22,17 @@ function TheatresPage({ navigate }) {
     t.postalCode.toLowerCase().includes(search.toLowerCase())
   );
 
-  const selected = THEATRES.find(t => t.id === selectedId) || filtered[0];
+  const selected = THEATRES.find(t => t.id === selectedId) || null;
+  const nowPlaying = selected ? (MOVIES_BY_THEATRE[selected.id] || []) : [];
 
   return (
     <div className="page-wrapper">
       <div className="page-hero">
-        <div className="page-hero-tag">📍 Toronto, ON · {THEATRES.length} Theatres Found</div>
+        <div className="page-hero-tag">📍 {THEATRES.length} Theatres · Updated Today</div>
         <h1 className="page-hero-title">Theatres Near You</h1>
         <p className="page-hero-desc">Find your nearest cinema. Search by name, postal code, or neighbourhood.</p>
       </div>
 
-      {/* Search bar */}
       <div className="theatre-search-bar">
         <div className="search-bar" style={{ maxWidth: 500, marginBottom: 0 }}>
           <input
@@ -37,7 +46,7 @@ function TheatresPage({ navigate }) {
       </div>
 
       <div className="theatres-layout">
-        {/* Theatre list */}
+        {/* ── THEATRE LIST ── */}
         <div className="theatres-list">
           {filtered.map(theatre => (
             <div
@@ -56,15 +65,11 @@ function TheatresPage({ navigate }) {
                   ))}
                 </div>
               </div>
-              <div>
+              <div className="theatre-card-right">
                 <div className="theatre-dist">{theatre.distance}</div>
-                <button
-                  className="theatre-book-btn"
-                  style={{ marginTop: 10 }}
-                  onClick={e => { e.stopPropagation(); navigate('nowplaying'); }}
-                >
-                  See Films
-                </button>
+                <div className="theatre-film-count">
+                  {(MOVIES_BY_THEATRE[theatre.id] || []).length} films
+                </div>
               </div>
             </div>
           ))}
@@ -75,46 +80,75 @@ function TheatresPage({ navigate }) {
           )}
         </div>
 
-        {/* Map placeholder */}
-        <div className="theatres-map">
-          <div className="map-placeholder">
-            <div className="map-grid" />
-            <div className="loc-map-inner">
-              <div style={{ textAlign: 'center', position: 'relative' }}>
-                <div className="map-gta-label">Greater Toronto Area</div>
-                {filtered.slice(0, 8).map((t, i) => {
-                  const positions = [
-                    { top: '-80px', left: '20px' }, { top: '-20px', left: '-60px' },
-                    { top: '40px', left: '-100px' }, { top: '-60px', left: '80px' },
-                    { top: '10px', left: '40px' },   { top: '-100px', left: '-20px' },
-                    { top: '50px', left: '60px' },   { top: '-40px', left: '-80px' },
-                  ];
-                  const pos = positions[i] || { top: `${-40 + i * 10}px`, left: `${-40 + i * 15}px` };
-                  return (
-                    <div
-                      key={t.id}
-                      className={`map-pin ${selected?.id === t.id ? 'active' : ''}`}
-                      style={pos}
-                      title={t.name}
-                      onClick={() => setSelectedId(t.id)}
-                    >
-                      📍
-                    </div>
-                  );
-                })}
+        {/* ── DETAIL PANEL ── */}
+        <div className="theatre-detail-panel">
+          {selected ? (
+            <>
+              {/* Theatre header */}
+              <div className="tdp-header">
+                <div>
+                  <div className="tdp-name">{selected.name}</div>
+                  <div className="tdp-chain">{selected.chain}</div>
+                  <div className="tdp-address">📍 {selected.address}</div>
+                  {selected.phone && <div className="tdp-phone">📞 {selected.phone}</div>}
+                </div>
+                <div className="tdp-dist">{selected.distance}</div>
               </div>
-            </div>
-          </div>
-          {selected && (
-            <div className="map-label">
-              <p style={{ fontWeight: 600 }}>📍 {selected.name}</p>
-              <p style={{ marginTop: 4, fontSize: '0.82rem', color: 'var(--muted)' }}>{selected.address}</p>
-              {selected.phone && <p style={{ marginTop: 2, fontSize: '0.78rem', color: 'var(--muted)' }}>{selected.phone}</p>}
-            </div>
-          )}
-          {!selected && (
-            <div className="map-label">
-              <p>📍 Select a theatre to see its details</p>
+
+              <div className="tdp-amenities">
+                {selected.amenities.map(a => (
+                  <span key={a} className="amenity-tag">{a}</span>
+                ))}
+              </div>
+
+              <div className="tdp-divider" />
+
+              {/* Now playing at this theatre */}
+              <div className="tdp-section-heading">
+                Now Playing · {nowPlaying.length} film{nowPlaying.length !== 1 ? 's' : ''}
+              </div>
+
+              {nowPlaying.length > 0 ? (
+                <div className="tdp-movie-list">
+                  {nowPlaying.map(movie => (
+                    <div key={movie.id} className="tdp-movie-row">
+                      <div
+                        className="tdp-movie-poster"
+                        style={{ background: POSTER_GRADIENTS[movie.poster] || POSTER_GRADIENTS.mp1 }}
+                      >
+                        {movie.posterUrl && !imgErrors[movie.id]
+                          ? <img
+                              src={movie.posterUrl}
+                              alt={movie.title}
+                              className="tdp-movie-img"
+                              onError={() => setImgErrors(prev => ({ ...prev, [movie.id]: true }))}
+                            />
+                          : <span className="tdp-movie-emoji">{movie.emoji}</span>
+                        }
+                      </div>
+                      <div className="tdp-movie-info">
+                        <div className="tdp-movie-title">{movie.title}</div>
+                        <div className="tdp-movie-meta">{movie.genre} · {movie.runtime} · {movie.ageRating}</div>
+                        <div className="tdp-time-chips">
+                          {movie.slots.map((slot, i) => (
+                            <span key={i} className="tdp-time-chip">
+                              {formatTime(slot.dateTime)}
+                              {slot.format && <span className="tdp-time-format">{slot.format.split('|')[0].trim()}</span>}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="tdp-empty">No showtimes found for today.</div>
+              )}
+            </>
+          ) : (
+            <div className="tdp-placeholder">
+              <div className="tdp-placeholder-icon">🎬</div>
+              <div className="tdp-placeholder-text">Select a theatre to see today's films and showtimes</div>
             </div>
           )}
         </div>

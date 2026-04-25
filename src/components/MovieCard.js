@@ -1,36 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { POSTER_GRADIENTS } from '../data/mockData';
 
-/**
- * MovieCard — reusable card for now playing & coming soon grids.
- *
- * Props:
- *  movie     {object}   – movie data object from mockData
- *  variant   {string}   – 'book' | 'remind' | 'preorder'
- *  onAction  {function} – called when the CTA button is clicked
- */
 function MovieCard({ movie, variant = 'book', onAction }) {
-  const gradient = POSTER_GRADIENTS[movie.poster] || POSTER_GRADIENTS.mp1;
+  const gradient = POSTER_GRADIENTS[movie.poster] || POSTER_GRADIENTS.default || POSTER_GRADIENTS.mp1;
+  const [imgFailed, setImgFailed] = useState(false);
+  const showImage = movie.posterUrl && !imgFailed;
 
   const handleAction = () => {
     if (onAction) onAction(movie);
   };
 
   const renderButton = () => {
-    if (variant === 'remind') {
-      return <button className="movie-remind-btn" onClick={handleAction}>🔔 Remind Me</button>;
-    }
-    if (variant === 'preorder') {
-      return <button className="movie-book-btn" onClick={handleAction}>Pre-Order</button>;
-    }
-    return <button className="movie-book-btn" onClick={handleAction}>Book Tickets</button>;
+    if (variant === 'remind')   return <button className="movie-remind-btn" onClick={handleAction}>🔔 Remind Me</button>;
+    if (variant === 'preorder') return <button className="movie-book-btn"   onClick={handleAction}>Pre-Order</button>;
+    return                              <button className="movie-book-btn"   onClick={handleAction}>View Details</button>;
   };
 
   return (
     <div className="movie-card">
       <div className="movie-poster">
         <div className="poster-gradient" style={{ background: gradient }}>
-          <span className="poster-emoji">{movie.emoji}</span>
+          {showImage
+            ? <img
+                src={movie.posterUrl}
+                alt={movie.title}
+                className="poster-img"
+                onError={() => setImgFailed(true)}
+              />
+            : <span className="poster-emoji">{movie.emoji}</span>
+          }
         </div>
         {movie.rating && <span className="rating-badge">{movie.rating}</span>}
         <span className="age-badge">{movie.ageRating}</span>

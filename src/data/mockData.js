@@ -95,12 +95,16 @@ function theatreAmenities(name) {
   return tags;
 }
 
+const TMS_IMG_BASE = 'http://developer.tmsimg.com/';
+
 // ─── NOW PLAYING (all 132 movies from JSON) ───
 export const NOW_PLAYING = MOVIES_RAW.map((m, i) => {
   const genres = m.genres || [];
   const g1 = genres[0] || 'Drama';
   const g2 = genres[1];
   const genreStr = g2 ? `${g1} · ${g2}` : g1;
+  const rawUri = m.preferredImage?.uri;
+  const imageUri = rawUri ? rawUri.split('?')[0] : null;
   return {
     id: m.tmsId,
     title: m.title,
@@ -112,6 +116,9 @@ export const NOW_PLAYING = MOVIES_RAW.map((m, i) => {
     ageRating: m.ratings?.[0]?.code || 'NR',
     emoji: GENRE_EMOJI[g1] || '🎬',
     poster: g1,
+    imageUri,
+    posterUrl: imageUri ? `${TMS_IMG_BASE}${imageUri}?w=240&h=360` : null,
+    posterUrlLarge: imageUri ? `${TMS_IMG_BASE}${imageUri}?w=480&h=720` : null,
     language: langDisplay(m.titleLang),
     director: m.directors?.[0] || '',
     cast: m.topCast || [],
@@ -159,6 +166,35 @@ export const THEATRES = ACTIVE_IDS
       rating: '',
     };
   });
+
+// ─── LOOKUP MAPS (built from real data) ───
+
+// theatreId → transformed THEATRES entry (address, phone, postalCode, etc.)
+export const THEATRE_LOOKUP = Object.fromEntries(THEATRES.map(t => [t.id, t]));
+
+// theatreId → array of movies showing there today with their slots
+export const MOVIES_BY_THEATRE = {};
+NOW_PLAYING.forEach(movie => {
+  movie.showtimes.forEach(s => {
+    if (!MOVIES_BY_THEATRE[s.theatreId]) MOVIES_BY_THEATRE[s.theatreId] = [];
+    let entry = MOVIES_BY_THEATRE[s.theatreId].find(e => e.id === movie.id);
+    if (!entry) {
+      entry = {
+        id: movie.id,
+        title: movie.title,
+        emoji: movie.emoji,
+        genre: movie.genre,
+        ageRating: movie.ageRating,
+        runtime: movie.runtime,
+        poster: movie.poster,
+        posterUrl: movie.posterUrl,
+        slots: [],
+      };
+      MOVIES_BY_THEATRE[s.theatreId].push(entry);
+    }
+    entry.slots.push({ dateTime: s.dateTime, format: s.format });
+  });
+});
 
 // ─── COMING SOON (kept as curated mock data) ───
 export const COMING_SOON_MARCH = [

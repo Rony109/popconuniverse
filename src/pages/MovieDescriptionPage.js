@@ -1,5 +1,5 @@
-import React from 'react';
-import { POSTER_GRADIENTS } from '../data/mockData';
+import React, { useState } from 'react';
+import { POSTER_GRADIENTS, THEATRE_LOOKUP } from '../data/mockData';
 import Footer from '../components/Footer';
 import './MovieDescriptionPage.css';
 
@@ -14,7 +14,15 @@ function formatTime(dateTimeStr) {
 function groupShowtimesByTheatre(showtimes) {
   const map = {};
   for (const s of showtimes) {
-    if (!map[s.theatreId]) map[s.theatreId] = { name: s.theatreName, slots: [] };
+    if (!map[s.theatreId]) {
+      const theatre = THEATRE_LOOKUP[s.theatreId];
+      map[s.theatreId] = {
+        name: s.theatreName,
+        address: theatre?.address || '',
+        postalCode: theatre?.postalCode || '',
+        slots: [],
+      };
+    }
     map[s.theatreId].slots.push({ time: formatTime(s.dateTime), format: s.format });
   }
   return Object.values(map);
@@ -32,7 +40,9 @@ function MovieDescriptionPage({ movie, navigate }) {
     );
   }
 
+  const [imgFailed, setImgFailed] = useState(false);
   const posterGradient = POSTER_GRADIENTS[movie.poster] || POSTER_GRADIENTS.default || POSTER_GRADIENTS.mp1;
+  const showImage = movie.posterUrlLarge && !imgFailed;
   const showtimeGroups = groupShowtimesByTheatre(movie.showtimes || []);
 
   return (
@@ -40,10 +50,18 @@ function MovieDescriptionPage({ movie, navigate }) {
       <div className="mdp-layout">
         {/* ── POSTER PANEL ── */}
         <div className="mdp-poster" style={{ background: posterGradient }}>
+          {showImage
+            ? <img
+                src={movie.posterUrlLarge}
+                alt={movie.title}
+                className="mdp-poster-img"
+                onError={() => setImgFailed(true)}
+              />
+            : <div className="mdp-poster-emoji">{movie.emoji}</div>
+          }
           <button className="mdp-back" onClick={() => navigate('nowplaying')}>
             ← Now Playing
           </button>
-          <div className="mdp-poster-emoji">{movie.emoji}</div>
           <div className="mdp-age-badge">{movie.ageRating}</div>
         </div>
 
@@ -88,6 +106,7 @@ function MovieDescriptionPage({ movie, navigate }) {
                 {showtimeGroups.map((group, i) => (
                   <div key={i} className="mdp-showtime-row">
                     <div className="mdp-st-theatre">{group.name}</div>
+                    {group.address && <div className="mdp-st-address">{group.address}</div>}
                     <div className="mdp-st-times">
                       {group.slots.map((slot, j) => (
                         <span key={j} className="mdp-st-time-chip">

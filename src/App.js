@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigation } from './hooks/useNavigation';
 import NavBar from './components/NavBar';
-import PageSwitcher from './components/PageSwitcher';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -37,7 +36,6 @@ function App() {
     <>
       <NavBar currentPage={currentPage} navigate={navigate} />
       {renderPage()}
-      <PageSwitcher currentPage={currentPage} navigate={navigate} />
     </>
   );
 }
