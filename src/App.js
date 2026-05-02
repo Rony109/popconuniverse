@@ -16,25 +16,26 @@ import MovieDescriptionPage from './pages/MovieDescriptionPage';
 function App() {
   const { currentPage, navigate } = useNavigation('home');
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [selectedCity, setSelectedCity] = useState({ id: 'toronto', label: 'Toronto', province: 'ON' });
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'home':             return <HomePage navigate={navigate} onSelectMovie={setSelectedMovie} />;
-      case 'nowplaying':       return <NowPlayingPage navigate={navigate} onSelectMovie={setSelectedMovie} />;
+      case 'home':             return <HomePage navigate={navigate} onSelectMovie={setSelectedMovie} selectedCity={selectedCity} />;
+      case 'nowplaying':       return <NowPlayingPage navigate={navigate} onSelectMovie={setSelectedMovie} selectedCity={selectedCity} />;
       case 'comingsoon':       return <ComingSoonPage navigate={navigate} />;
-      case 'theatres':         return <TheatresPage navigate={navigate} />;
+      case 'theatres':         return <TheatresPage navigate={navigate} selectedCity={selectedCity} />;
       case 'giftcards':        return <GiftCardsPage navigate={navigate} />;
-      case 'location':         return <LocationPage navigate={navigate} />;
+      case 'location':         return <LocationPage navigate={navigate} selectedCity={selectedCity} onSelectCity={setSelectedCity} />;
       case 'signin':           return <SignInPage navigate={navigate} />;
       case 'join':             return <JoinPage navigate={navigate} />;
       case 'moviedescription': return <MovieDescriptionPage movie={selectedMovie} navigate={navigate} />;
-      default:                 return <HomePage navigate={navigate} onSelectMovie={setSelectedMovie} />;
+      default:                 return <HomePage navigate={navigate} onSelectMovie={setSelectedMovie} selectedCity={selectedCity} />;
     }
   };
 
   return (
     <>
-      <NavBar currentPage={currentPage} navigate={navigate} />
+      <NavBar currentPage={currentPage} navigate={navigate} selectedCity={selectedCity} />
       {renderPage()}
     </>
   );

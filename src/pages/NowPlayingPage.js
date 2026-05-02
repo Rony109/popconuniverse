@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MovieCard from '../components/MovieCard';
 import Footer from '../components/Footer';
-import { NOW_PLAYING } from '../data/mockData';
+import { NOW_PLAYING, THEATRES } from '../data/mockData';
 import './NowPlayingPage.css';
 
 const GENRES = [
@@ -12,7 +12,7 @@ const GENRES = [
 const AGE_RATINGS = ['All Ratings', 'G', 'PG', 'PG-13', 'R', 'NR'];
 const SORT_OPTIONS = ['Popularity', 'Rating', 'Release Date', 'Alphabetical'];
 
-function NowPlayingPage({ navigate, onSelectMovie }) {
+function NowPlayingPage({ navigate, onSelectMovie, selectedCity }) {
   const [activeSort, setActiveSort] = useState('Popularity');
   const [checkedGenres, setCheckedGenres] = useState(['All Genres']);
   const [checkedAges, setCheckedAges] = useState(['All Ratings']);
@@ -33,7 +33,16 @@ function NowPlayingPage({ navigate, onSelectMovie }) {
     });
   };
 
+  const cityLabel = selectedCity?.label || 'Toronto';
+  const cityTheatreIds = new Set(
+    THEATRES.filter(t => t.city.toLowerCase() === cityLabel.toLowerCase()).map(t => t.id)
+  );
+
   const filtered = NOW_PLAYING.filter(movie => {
+    const playsInCity = cityTheatreIds.size > 0
+      ? (movie.showtimes || []).some(s => cityTheatreIds.has(s.theatreId))
+      : false;
+    if (!playsInCity) return false;
     if (!checkedGenres.includes('All Genres')) {
       const hasGenre = (movie.genres || []).some(g => checkedGenres.includes(g));
       if (!hasGenre) return false;
@@ -53,9 +62,9 @@ function NowPlayingPage({ navigate, onSelectMovie }) {
   return (
     <div className="page-wrapper">
       <div className="page-hero">
-        <div className="page-hero-tag">🎬 Toronto, ON · Updated Today</div>
+        <div className="page-hero-tag">🎬 {selectedCity ? `${selectedCity.label}, ${selectedCity.province}` : 'Canada'} · Updated Today</div>
         <h1 className="page-hero-title">Now Playing</h1>
-        <p className="page-hero-desc">{NOW_PLAYING.length} films showing across theatres in the Greater Toronto Area this week.</p>
+        <p className="page-hero-desc">{filtered.length} film{filtered.length !== 1 ? 's' : ''} showing across theatres in {cityLabel} this week.</p>
       </div>
 
       <div className="np-layout">
@@ -105,7 +114,7 @@ function NowPlayingPage({ navigate, onSelectMovie }) {
                 {opt}
               </div>
             ))}
-            <span className="np-results-count">Showing {sorted.length} of {NOW_PLAYING.length} films</span>
+            <span className="np-results-count">Showing {sorted.length} films in {cityLabel}</span>
           </div>
 
           <div className="movies-grid-4">

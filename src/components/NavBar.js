@@ -1,7 +1,8 @@
 import React from 'react';
+import logoLight from '../assets/logo/Logo-Light.png';
 import './NavBar.css';
 
-function NavBar({ currentPage, navigate }) {
+function NavBar({ currentPage, navigate, selectedCity }) {
   const navLinks = [
     { id: 'home',       label: 'Home' },
     { id: 'nowplaying', label: 'Now Playing' },
@@ -10,17 +11,14 @@ function NavBar({ currentPage, navigate }) {
     { id: 'giftcards',  label: 'Gift Cards' },
   ];
 
+  const cityLabel = selectedCity
+    ? `${selectedCity.label}, ${selectedCity.province}`
+    : 'Select City';
+
   return (
     <nav className="nav-bar">
       <button className="logo" onClick={() => navigate('home')}>
-        <span className="logo-icon">🍿</span>
-        <div>
-          <div className="logo-text">
-            <span className="pop">Popcorn</span>
-            <span className="uni"> Universe</span>
-          </div>
-          <span className="logo-sub">Canada's Movie Universe</span>
-        </div>
+        <img src={logoLight} alt="Popcorn Universe" className="logo-img" />
       </button>
 
       <div className="nav-links">
@@ -37,7 +35,7 @@ function NavBar({ currentPage, navigate }) {
 
       <div className="nav-right">
         <button className="nav-province" onClick={() => navigate('location')}>
-          📍 Ontario, CA
+          📍 {cityLabel}
         </button>
         <button className="btn-ghost" onClick={() => navigate('signin')}>Sign In</button>
         <button className="btn-butter" onClick={() => navigate('join')}>Join Free</button>

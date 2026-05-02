@@ -118,7 +118,7 @@ export const NOW_PLAYING = MOVIES_RAW.map((m, i) => {
     emoji: GENRE_EMOJI[g1] || '🎬',
     poster: g1,
     imageUri,
-    posterUrl: imageUri ? `${TMS_IMG_BASE}${imageUri}?w=240&h=360&api_key=${TMS_API_KEY}` : null,
+    posterUrl: rawUri ? `${TMS_IMG_BASE}${rawUri}&api_key=${TMS_API_KEY}` : null,
     posterUrlLarge: imageUri ? `${TMS_IMG_BASE}${imageUri}?w=480&h=720&api_key=${TMS_API_KEY}` : null,
     language: langDisplay(m.titleLang),
     director: m.directors?.[0] || '',

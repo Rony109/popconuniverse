@@ -13,10 +13,10 @@
   background: none; border: none; text-align: left;
 }
 
-.logo-icon {
-  font-size: 1.7rem; line-height: 1;
-  filter: drop-shadow(0 0 8px rgba(245,200,66,0.5));
-  animation: kernelpop 3s ease-in-out infinite;
+.logo-img {
+  height: 36px;
+  width: auto;
+  display: block;
 }
 
 .logo-text {

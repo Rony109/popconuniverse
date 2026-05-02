@@ -31,7 +31,7 @@ const GPS_LABELS = {
   unsupported: 'GPS not supported in this browser',
 };
 
-function TheatresPage({ navigate }) {
+function TheatresPage({ navigate, selectedCity }) {
   const [selectedId, setSelectedId]   = useState(null);
   const [search, setSearch]           = useState('');
   const [imgErrors, setImgErrors]     = useState({});
@@ -58,11 +58,15 @@ function TheatresPage({ navigate }) {
 
   // Build the sorted+filtered list, recalculating distances when userLocation changes
   const displayTheatres = useMemo(() => {
-    let list = THEATRES.filter(t =>
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.address.toLowerCase().includes(search.toLowerCase()) ||
-      t.postalCode.toLowerCase().includes(search.toLowerCase())
-    );
+    const cityLabel = selectedCity?.label || 'Toronto';
+    let list = THEATRES.filter(t => {
+      const matchesCity = t.city.toLowerCase() === cityLabel.toLowerCase();
+      const matchesSearch =
+        t.name.toLowerCase().includes(search.toLowerCase()) ||
+        t.address.toLowerCase().includes(search.toLowerCase()) ||
+        t.postalCode.toLowerCase().includes(search.toLowerCase());
+      return matchesCity && matchesSearch;
+    });
 
     if (userLocation) {
       list = list
@@ -78,7 +82,7 @@ function TheatresPage({ navigate }) {
     }
 
     return list;
-  }, [search, userLocation]);
+  }, [search, userLocation, selectedCity]);
 
   const selected   = THEATRES.find(t => t.id === selectedId) || null;
   const nowPlaying = selected ? (MOVIES_BY_THEATRE[selected.id] || []) : [];
@@ -90,9 +94,9 @@ function TheatresPage({ navigate }) {
   return (
     <div className="page-wrapper">
       <div className="page-hero">
-        <div className="page-hero-tag">📍 {THEATRES.length} Theatres · Updated Today</div>
+        <div className="page-hero-tag">📍 {selectedCity ? `${selectedCity.label}, ${selectedCity.province}` : 'Canada'} · Updated Today</div>
         <h1 className="page-hero-title">Theatres Near You</h1>
-        <p className="page-hero-desc">Find your nearest cinema. Search by name, postal code, or neighbourhood.</p>
+        <p className="page-hero-desc">Find your nearest cinema in {selectedCity?.label || 'your city'}. Search by name, postal code, or neighbourhood.</p>
       </div>
 
       {/* ── SEARCH + LOCATION BAR ── */}
@@ -152,8 +156,9 @@ function TheatresPage({ navigate }) {
             </div>
           ))}
           {displayTheatres.length === 0 && (
-            <div style={{ padding: '24px', color: 'var(--muted)', textAlign: 'center' }}>
-              No theatres match your search.
+            <div style={{ padding: '24px', color: 'var(--muted)', textAlign: 'center', lineHeight: 1.7 }}>
+              No theatres found in {selectedCity?.label || 'your city'}.<br/>
+              <span style={{ fontSize: '0.75rem' }}>Try selecting a different city from the location menu.</span>
             </div>
           )}
         </div>
