@@ -58,13 +58,13 @@ function TheatresPage({ navigate, selectedCity }) {
 
   // Build the sorted+filtered list, recalculating distances when userLocation changes
   const displayTheatres = useMemo(() => {
-    const cityLabel = selectedCity?.label || 'Toronto';
+    const cityLabel = (selectedCity?.label || 'Toronto').toLowerCase();
     let list = THEATRES.filter(t => {
-      const matchesCity = t.city.toLowerCase() === cityLabel.toLowerCase();
+      const matchesCity = (t.city || '').toLowerCase() === cityLabel;
       const matchesSearch =
-        t.name.toLowerCase().includes(search.toLowerCase()) ||
-        t.address.toLowerCase().includes(search.toLowerCase()) ||
-        t.postalCode.toLowerCase().includes(search.toLowerCase());
+        (t.name || '').toLowerCase().includes(search.toLowerCase()) ||
+        (t.address || '').toLowerCase().includes(search.toLowerCase()) ||
+        (t.postalCode || '').toLowerCase().includes(search.toLowerCase());
       return matchesCity && matchesSearch;
     });
 
