@@ -106,6 +106,7 @@ export const NOW_PLAYING = MOVIES_RAW.map((m, i) => {
   const genreStr = g2 ? `${g1} · ${g2}` : g1;
   const rawUri = m.preferredImage?.uri;
   const imageUri = rawUri ? rawUri.split('?')[0] : null;
+  const localFilename = imageUri ? imageUri.split('/').pop() : null;
   return {
     id: m.tmsId,
     title: m.title,
@@ -118,8 +119,8 @@ export const NOW_PLAYING = MOVIES_RAW.map((m, i) => {
     emoji: GENRE_EMOJI[g1] || '🎬',
     poster: g1,
     imageUri,
-    posterUrl: rawUri ? `${TMS_IMG_BASE}${rawUri}&api_key=${TMS_API_KEY}` : null,
-    posterUrlLarge: imageUri ? `${TMS_IMG_BASE}${imageUri}?w=480&h=720&api_key=${TMS_API_KEY}` : null,
+    posterUrl: localFilename ? `/posters/${localFilename}` : null,
+    posterUrlLarge: localFilename ? `/posters/${localFilename}` : null,
     language: langDisplay(m.titleLang),
     director: m.directors?.[0] || '',
     cast: m.topCast || [],
