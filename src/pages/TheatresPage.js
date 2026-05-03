@@ -206,6 +206,7 @@ function TheatresPage({ navigate, selectedCity }) {
                               src={movie.posterUrl}
                               alt={movie.title}
                               className="tdp-movie-img"
+                              referrerPolicy="no-referrer"
                               onError={() => setImgErrors(prev => ({ ...prev, [movie.id]: true }))}
                             />
                           : <span className="tdp-movie-emoji">{movie.emoji}</span>

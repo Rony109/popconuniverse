@@ -25,6 +25,7 @@ function MovieCard({ movie, variant = 'book', onAction }) {
                 src={movie.posterUrl}
                 alt={movie.title}
                 className="poster-img"
+                referrerPolicy="no-referrer"
                 onError={() => setImgFailed(true)}
               />
             : <span className="poster-emoji">{movie.emoji}</span>

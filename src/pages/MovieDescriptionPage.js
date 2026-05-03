@@ -55,6 +55,7 @@ function MovieDescriptionPage({ movie, navigate }) {
                 src={movie.posterUrlLarge}
                 alt={movie.title}
                 className="mdp-poster-img"
+                referrerPolicy="no-referrer"
                 onError={() => setImgFailed(true)}
               />
             : <div className="mdp-poster-emoji">{movie.emoji}</div>

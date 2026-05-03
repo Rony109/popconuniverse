@@ -96,7 +96,7 @@ function theatreAmenities(name) {
 }
 
 const TMS_IMG_BASE = 'http://developer.tmsimg.com/';
-const TMS_API_KEY  = process.env.REACT_APP_TMS_API_KEY || '';
+const TMS_API_KEY  = '4zbcbwxse5pe84q2x2efevj5';
 
 // ─── NOW PLAYING (all 132 movies from JSON) ───
 export const NOW_PLAYING = MOVIES_RAW.map((m, i) => {
